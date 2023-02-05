@@ -12,6 +12,11 @@ def startup():
     validate_dependencies()
 
 
+@app.get("/", tags=["welcome"])
+def welcome():
+    return {"status": "Ready to Rock!"}
+
+
 @app.get("/info")
 def model_info():
     return get_model_properties()
