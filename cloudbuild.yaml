@@ -8,7 +8,7 @@ steps:
     args: [ "-m", "pytest", "--junitxml=${SHORT_SHA}_test_log.xml" ]
     id: Run unit tests
   - name: 'gcr.io/cloud-builders/gsutil'
-    args: [ '-m', 'cp', '-r', 'gs://book-recommender-model-saves/$_MODEL_VERSION', '.' ]
+    args: [ '-m', 'cp', '-r', 'gs://book-recommender-model-saves/$_MODEL_VERSION', '/code/.' ]
     id: Download model files
   - name: gcr.io/cloud-builders/docker
     args:
