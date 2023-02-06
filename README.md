@@ -5,7 +5,7 @@ model requires both the training weights as well as the book dataset it is refer
 
 ## Prerequisites
 
-- Python 3.10+
+- Python 3.10
 - Collab NN model weights
 - Book dataset
 
