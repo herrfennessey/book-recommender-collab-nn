@@ -6,7 +6,7 @@ steps:
     entrypoint: python
     args: [ "-m", "pytest", "--junitxml=${SHORT_SHA}_test_log.xml" ]
   - name: 'gcr.io/cloud-builders/gsutil'
-    args: [ 'cp', '-r', 'gs://$PROJECT_ID/$_MODEL_VERSION', '.' ]
+    args: [ 'cp', '-r', 'gs://book-recommender-model-saves/$_MODEL_VERSION', '.' ]
   - name: gcr.io/cloud-builders/docker
     args:
       - build
