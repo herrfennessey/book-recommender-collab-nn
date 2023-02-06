@@ -20,6 +20,8 @@ model requires both the training weights as well as the book dataset it is refer
 2. Run the application:
 
     ```
-    cd fastapi-large-dataframe
+    cd book-recommender-collab-nn
     uvicorn app:app --reload
     ```
+
+
