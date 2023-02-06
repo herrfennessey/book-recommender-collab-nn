@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Model folder used for dev/testing
+/1672594012/
+
