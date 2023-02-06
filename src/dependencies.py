@@ -10,7 +10,7 @@ import torch
 
 from src.model.ncf import NCF
 
-root_path = Path(os.getenv("MODEL_FOLDER"))
+root_path = Path(os.getenv("MODEL_FOLDER", "."))
 
 book_id_to_f_book_id = {}
 f_book_id_to_book_id = {}
