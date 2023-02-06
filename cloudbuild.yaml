@@ -29,7 +29,7 @@ steps:
       - '--platform=managed'
       - '--image=$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
       - >-
-        --labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID,gcb-trigger-id=$_TRIGGER_ID,$_LABELS
+        --labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID,gcb-trigger-id=$_TRIGGER_ID
       - '--region=$_DEPLOY_REGION'
       - '--quiet'
     id: Deploy
@@ -39,13 +39,12 @@ images:
 options:
   substitutionOption: ALLOW_LOOSE
 substitutions:
-  _SERVICE_NAME: book-recommender-api
+  _PLATFORM: managed
+  _SERVICE_NAME: book-recommender-collab-nn
+  _TRIGGER_ID: eee6c1dd-9d14-45af-ba1a-b56d0d55c1cc
   _DEPLOY_REGION: us-east1
   _GCR_HOSTNAME: us.gcr.io
-  _PLATFORM: managed
-  _LABELS: gcb-trigger-id=eb98e249-9902-424b-81de-cef40c3ffb85
-  _TRIGGER_ID: eb98e249-9902-424b-81de-cef40c3ffb85
 tags:
   - gcp-cloud-build-deploy-cloud-run
   - gcp-cloud-build-deploy-cloud-run-managed
-  - book-recommender-api
+  - book-recommender-collab-nn
