@@ -24,7 +24,7 @@ class PredictionService:
 
     def predict(self, user_id, genres: List[GenreList], book_size: BookSize, num_books: int = 20):
         logger.info("Getting %d book predictions for user %s with genres: %s, for book_size: %s", num_books, user_id,
-                    ", ".join(genres), book_size)
+                    genres, book_size)
         return PredictionServiceResponse(book_ids=[1, 2, 3])
 
 
