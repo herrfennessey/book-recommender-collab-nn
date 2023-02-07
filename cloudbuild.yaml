@@ -10,12 +10,6 @@ steps:
   - name: 'gcr.io/cloud-builders/gsutil'
     args: [ '-m', 'cp', '-r', 'gs://book-recommender-model-saves/$_MODEL_VERSION', '.' ]
     id: Download model files
-  - name: bash
-    args: [ 'ls', '-R' ]
-    id: List files
-  - name: bash
-    args: [ 'pwd' ]
-    id: Print working directory
   - name: gcr.io/cloud-builders/docker
     args:
       - build

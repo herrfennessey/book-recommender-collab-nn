@@ -7,8 +7,15 @@ from pathlib import Path
 import pandas
 import pandas as pd
 import torch
+from pydantic import BaseSettings
 
-from src.model.ncf import NCF
+from src.ml.ncf import NCF
+
+
+class Properties(BaseSettings):
+    env_name: str = "local"
+    book_recommender_api_base_url: str = "http://localhost:8999"
+
 
 root_path = Path(os.getenv("MODEL_FOLDER", "."))
 
