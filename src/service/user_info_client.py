@@ -15,7 +15,13 @@ def get_properties():
 
 
 class UserInfoClient(object):
-    def __init__(self, properties: Properties = Depends(get_properties)):
+    """
+    Client wrappper around the Book Recommender API. This API will be used to determine
+    the books that a user has read. This information will be used to exclude books that
+    the user has already read from the recommendations.
+    """
+
+    def __init__(self, properties):
         self.base_url = properties.book_recommender_api_base_url
 
     def get_books_read(self, user_id):
@@ -54,3 +60,10 @@ class UserInfoClientException(Exception):
 
 class UserInfoServerException(Exception):
     pass
+
+
+def get_user_info_client(properties: Properties = Depends(get_properties)) -> UserInfoClient:
+    """
+    Used for FastAPI dependency injection
+    """
+    return UserInfoClient(properties=properties)
