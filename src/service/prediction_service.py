@@ -22,9 +22,10 @@ class PredictionService:
         self.model = model
         self.books_dataframe = books_dataframe
 
-    def predict(self, user_id, genres: List[GenreList], book_size: BookSize, num_books: int = 20):
-        logger.info("Getting %d book predictions for user %s with genres: %s, for book_size: %s", num_books, user_id,
-                    genres, book_size)
+    def predict(self, user_id, genres: List[GenreList], book_size: BookSize, page_size: int = 20, page: int = 1):
+        logger.info("Getting %d book predictions for user %s with genres: %s, page %d for book_size: %s", page_size,
+                    page, user_id, genres, book_size)
+        
         return PredictionServiceResponse(book_ids=[1, 2, 3])
 
 

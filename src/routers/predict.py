@@ -19,6 +19,7 @@ async def get_book_predictions(
             example=2189273),
         genres: List[GenreList] = Query(None),
         book_size: BookSize = Query(None),
-        count: int = Query(20, gt=0, le=100),
+        page_size: int = Query(20, gt=0, le=100),
+        page: int = Query(1, gt=0),
         prediction_service: PredictionService = Depends(get_prediction_service)):
-    return prediction_service.predict(user_id, genres, book_size, count)
+    return prediction_service.predict(user_id, genres, book_size, page_size, page)
