@@ -60,7 +60,7 @@ def validate_dependencies():
     assert len(get_f_book_id_to_book_id()) > 0, "f_book_id_to_book_id not initialized"
     assert len(get_f_user_id_to_user_id()) > 0, "f_user_id_to_user_id not initialized"
     assert len(get_model_properties()) > 0, "model_properties not initialized"
-    assert type(get_model()) == NCF, "ml not initialized"
+    assert type(get_model()) == NCF, "model not initialized"
     assert get_books_df() is not None, "books_df not initialized"
     logging.warning("Dependencies validated! Ready to Rock!")
 
