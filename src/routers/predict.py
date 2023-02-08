@@ -17,9 +17,8 @@ async def get_book_predictions(
             title="The user ID from the Goodreads profile",
             gt=0,
             example=2189273),
-        genres: List[GenreList] = Query(None),
+        genres: List[GenreList] = Query(list()),
         book_size: BookSize = Query(None),
-        page_size: int = Query(20, gt=0, le=100),
-        page: int = Query(1, gt=0),
+        count: int = Query(20, gt=0, le=100),
         prediction_service: PredictionService = Depends(get_prediction_service)):
-    return prediction_service.predict(user_id, genres, book_size, page_size, page)
+    return prediction_service.predict(user_id, genres, book_size, count)
