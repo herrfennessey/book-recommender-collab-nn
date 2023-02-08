@@ -11,6 +11,9 @@ from pydantic import BaseSettings
 
 from src.ml.ncf import NCF
 
+# We cut off the top N of the books by popularity because everyone has read Harry Potter. Currently set to .5%
+QUANTILE_CUTOFF = 0.995
+
 
 class Properties(BaseSettings):
     env_name: str = "local"
@@ -33,6 +36,7 @@ def initialize_dependencies():
     start_time = time.time()
     global book_id_to_f_book_id
     global f_book_id_to_book_id
+    global user_id_to_f_user_id
     global f_user_id_to_user_id
     global user_to_books_read
     global model
@@ -41,10 +45,12 @@ def initialize_dependencies():
 
     book_id_to_f_book_id = pickle.load(open(root_path / "book_id_to_f_book_id.p", "rb"))
     f_book_id_to_book_id = pickle.load(open(root_path / "f_book_id_to_book_id.p", "rb"))
+    user_id_to_f_user_id = pickle.load(open(root_path / "user_id_to_f_user_id.p", "rb"))
     f_user_id_to_user_id = pickle.load(open(root_path / "f_user_id_to_user_id.p", "rb"))
     model_properties = pickle.load(open(root_path / "model_properties.p", "rb"))
 
     books_df = pandas.read_csv(root_path / "books.csv")
+    books_df = books_df[books_df['num_ratings'] < books_df['num_ratings'].quantile(QUANTILE_CUTOFF)]
 
     # Stand up model and load weights
     model_weights = torch.load(root_path / "model_weights.pth")
@@ -58,6 +64,7 @@ def initialize_dependencies():
 def validate_dependencies():
     assert len(get_book_id_to_f_book_id()) > 0, "book_id_to_f_book_id not initialized"
     assert len(get_f_book_id_to_book_id()) > 0, "f_book_id_to_book_id not initialized"
+    assert len(get_user_id_to_f_user_id()) > 0, "user_id_to_f_user_id not initialized"
     assert len(get_f_user_id_to_user_id()) > 0, "f_user_id_to_user_id not initialized"
     assert len(get_model_properties()) > 0, "model_properties not initialized"
     assert type(get_model()) == NCF, "model not initialized"
@@ -71,6 +78,10 @@ def get_book_id_to_f_book_id() -> dict:
 
 def get_f_book_id_to_book_id() -> dict:
     return f_book_id_to_book_id
+
+
+def get_user_id_to_f_user_id() -> dict:
+    return f_user_id_to_user_id
 
 
 def get_f_user_id_to_user_id() -> dict:
