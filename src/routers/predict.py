@@ -5,7 +5,7 @@ from fastapi import APIRouter, Query, Path, Depends
 
 from src.models.book_size import BookSize
 from src.models.genre_list import GenreList
-from src.service.prediction_service import PredictionService, get_prediction_service
+from src.service.prediction_service import PredictionService, get_prediction_service, PredictionServiceResponse
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/predict")
@@ -20,5 +20,5 @@ async def get_book_predictions(
         genres: List[GenreList] = Query(list()),
         book_size: BookSize = Query(None),
         count: int = Query(20, gt=0, le=100),
-        prediction_service: PredictionService = Depends(get_prediction_service)):
+        prediction_service: PredictionService = Depends(get_prediction_service)) -> PredictionServiceResponse:
     return prediction_service.predict(user_id, genres, book_size, count)

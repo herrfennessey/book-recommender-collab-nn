@@ -7,7 +7,8 @@ from fastapi.testclient import TestClient
 
 from src.dependencies import get_books_df, get_book_id_to_f_book_id, get_user_id_to_f_user_id, Properties
 from src.main import app
-from src.service.user_info_client import UserInfoClient, get_user_info_client, BooksReadResponse
+from src.service.user_info_client import UserInfoClient, get_user_info_client, BooksReadResponse, \
+    UserInfoServerException, UserInfoClientException
 
 
 @pytest.fixture()
@@ -39,6 +40,65 @@ def test_router_works(test_client: TestClient):
 def test_query_validation_count_between_0_and_100(count, expected_code, test_client: TestClient):
     response = test_client.get("/predict/1?count={}".format(count))
     assert_that(response.status_code).is_equal_to(expected_code)
+
+
+def test_count_works_to_limit_results(test_client: TestClient):
+    response = test_client.get("/predict/1?count=1")
+    assert_that(response.json().get("items")).is_length(1)
+
+
+@pytest.mark.parametrize("genre_list, expected_count", [([], 3),
+                                                        (["young_adult"], 1),
+                                                        (["young_adult", "romance"], 1),
+                                                        (["young_adult", "science"], 0)])
+def test_genre_filters_correctly_filter_down_results(genre_list, expected_count, test_client: TestClient):
+    genre_query_params = "&".join(["genres={}".format(genre) for genre in genre_list])
+    response = test_client.get("/predict/1?{}".format(genre_query_params))
+    assert_that(response.json().get("items")).is_length(expected_count)
+
+
+@pytest.mark.parametrize("books_read, expected_count", [([1, 2, 3], 0),
+                                                        ([1, 2], 1),
+                                                        ([1], 2),
+                                                        ([], 3)])
+def test_previous_books_read_correctly_removes_book_from_suggestions(books_read,
+                                                                     expected_count,
+                                                                     user_info_client_mock: UserInfoClient,
+                                                                     test_client: TestClient):
+    # Given
+    user_info_client_mock.get_books_read = MagicMock(return_value=BooksReadResponse(book_ids=books_read))
+
+    # When
+    response = test_client.get("/predict/1?")
+
+    # Then
+    assert_that(response.json().get("items")).is_length(expected_count)
+
+
+def test_user_info_service_throwing_server_exception_doesnt_block_prediction(
+        user_info_client_mock: UserInfoClient,
+        test_client: TestClient):
+    # Given
+    user_info_client_mock.get_books_read = MagicMock(side_effect=UserInfoServerException("Boom"))
+
+    # When
+    response = test_client.get("/predict/1?")
+
+    # Then
+    assert_that(response.json().get("items")).is_length(3)
+
+
+def test_user_info_service_throwing_client_exception_doesnt_block_prediction(
+        user_info_client_mock: UserInfoClient,
+        test_client: TestClient):
+    # Given
+    user_info_client_mock.get_books_read = MagicMock(side_effect=UserInfoClientException("Boom"))
+
+    # When
+    response = test_client.get("/predict/1?")
+
+    # Then
+    assert_that(response.json().get("items")).is_length(3)
 
 
 def _stub_dataframe_dependency():

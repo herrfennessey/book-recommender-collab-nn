@@ -50,11 +50,14 @@ class PredictionService:
 
         books_read = self._get_books_read(user_id)
         candidate_df = self._get_candidates(genres, books_read)
-        scored_candidates = self._score_candidates_for_user(candidate_df, user_id)
+        if candidate_df.empty:
+            scored_items = []
+        else:
+            scored_candidates = self._score_candidates_for_user(candidate_df, user_id)
+            scored_items = [PredictionServiceItem(**item) for item in scored_candidates][:count]
 
-        candidate_items = [PredictionServiceItem(**item) for item in scored_candidates][:count]
         took_ms = (time.time() - start_time) * 1000
-        return PredictionServiceResponse(items=candidate_items, count=len(scored_candidates), took_ms=took_ms)
+        return PredictionServiceResponse(items=scored_items, count=len(scored_items), took_ms=took_ms)
 
     def _get_books_read(self, user_id):
         try:
