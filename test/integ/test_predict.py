@@ -1,27 +1,38 @@
+from unittest.mock import MagicMock
+
 import pandas as pd
 import pytest
 from assertpy import assert_that
 from fastapi.testclient import TestClient
 
-from src.dependencies import get_books_df, get_book_id_to_f_book_id, get_user_id_to_f_user_id
+from src.dependencies import get_books_df, get_book_id_to_f_book_id, get_user_id_to_f_user_id, Properties
 from src.main import app
+from src.service.user_info_client import UserInfoClient, get_user_info_client, BooksReadResponse
+
+
+@pytest.fixture()
+def user_info_client_mock():
+    user_info_client = UserInfoClient(Properties())
+    user_info_client.get_books_read = MagicMock(return_value=BooksReadResponse(book_ids=[4, 5, 6]))
+    yield user_info_client
 
 
 @pytest.fixture(autouse=True)
-def run_around_tests():
+def run_around_tests(user_info_client_mock):
     # Code run before all tests
     _stub_dataframe_dependency()
     _stub_book_id_to_f_book_id()
     _stub_user_id_to_f_user_id()
+    _stub_user_info_client(user_info_client_mock)
+
     yield
     # Code that will run after each test
     app.dependency_overrides = {}
 
 
 def test_router_works(test_client: TestClient):
-    response = test_client.get("/predict/1?genres=fantasy&genres=romance&book_size=large")
+    response = test_client.get("/predict/1")
     assert_that(response.status_code).is_equal_to(200)
-    assert_that(response.json()).is_equal_to({"book_ids": [1, 2, 3]})
 
 
 @pytest.mark.parametrize("count, expected_code", [(-1, 422), (50, 200), (101, 422)])
@@ -79,3 +90,7 @@ def _stub_book_id_to_f_book_id():
 
 def _stub_user_id_to_f_user_id():
     app.dependency_overrides[get_user_id_to_f_user_id] = lambda: {1: 1}
+
+
+def _stub_user_info_client(user_info_client_mock):
+    app.dependency_overrides[get_user_info_client] = lambda: user_info_client_mock

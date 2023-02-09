@@ -81,7 +81,7 @@ def get_f_book_id_to_book_id() -> dict:
 
 
 def get_user_id_to_f_user_id() -> dict:
-    return f_user_id_to_user_id
+    return user_id_to_f_user_id
 
 
 def get_f_user_id_to_user_id() -> dict:

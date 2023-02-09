@@ -52,7 +52,7 @@ class PredictionService:
         candidate_df = self._get_candidates(genres, books_read)
         scored_candidates = self._score_candidates_for_user(candidate_df, user_id)
 
-        candidate_items = [PredictionServiceItem(**item) for item in scored_candidates]
+        candidate_items = [PredictionServiceItem(**item) for item in scored_candidates][:count]
         took_ms = (time.time() - start_time) * 1000
         return PredictionServiceResponse(items=candidate_items, count=len(scored_candidates), took_ms=took_ms)
 
@@ -70,6 +70,7 @@ class PredictionService:
             query = " & ".join(f"{genre.name} == 1" for genre in genres)
             all_candidates.query(query, inplace=True)
 
+        # Remove books already read
         all_candidates = all_candidates[~all_candidates['book_id'].isin(books_read)]
         return all_candidates
 
