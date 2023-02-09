@@ -3,7 +3,6 @@ from typing import List
 
 from fastapi import APIRouter, Query, Path, Depends
 
-from src.models.book_size import BookSize
 from src.models.genre_list import GenreList
 from src.service.prediction_service import PredictionService, get_prediction_service, PredictionServiceResponse
 
@@ -18,7 +17,6 @@ async def get_book_predictions(
             gt=0,
             example=2189273),
         genres: List[GenreList] = Query(list()),
-        book_size: BookSize = Query(None),
         count: int = Query(20, gt=0, le=100),
         prediction_service: PredictionService = Depends(get_prediction_service)) -> PredictionServiceResponse:
-    return prediction_service.predict(user_id, genres, book_size, count)
+    return prediction_service.predict(user_id, genres, count)

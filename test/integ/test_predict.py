@@ -117,7 +117,7 @@ def _stub_dataframe_dependency():
                     False, True, True, False, False, False, True, False, False, False, False, False, False, False,
                     False, False, False, True, False, False, False, False, True, False, False, False, False, False,
                     False, True, False, 0.0418499896502789, -0.4579905871559674, 0.2142191968111878, 0.547506711217822],
-                   [3, "2 States: The Story of My Marriage", 3.43, 92423, 269.0, 44978, 55063,
+                   [3, "2 States: The Story of My Marriage", 3.43, 92423, 244.0, 44978, 55063,
                     "https://www.goodreads.com/author/show/61124.Chetan_Bhagat", 3,
                     "/book/show/6969361-2-states", 8129115301.0, 9788129115300.0, 8129115301, "English", 61124,
                     "/book/show/6969361-2-states", False, False, True, False, False, False, False, False, False, False,

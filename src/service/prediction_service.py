@@ -10,7 +10,6 @@ from pydantic import BaseSettings
 
 from src.dependencies import get_model, get_books_df
 from src.ml.ncf import NCF
-from src.models.book_size import BookSize
 from src.models.genre_list import GenreList
 from src.service.factorization_service import FactorizationService, get_factorization_service
 from src.service.user_info_client import UserInfoClient, get_user_info_client, UserInfoClientException, \
@@ -42,14 +41,12 @@ class PredictionService:
         self.user_info_client = user_info_client
         self.factorization_service = factorization_service
 
-    def predict(self, user_id, genres: List[GenreList], book_size: BookSize,
-                count: int = 20) -> PredictionServiceResponse:
+    def predict(self, user_id, genres: List[GenreList], count: int = 20) -> PredictionServiceResponse:
         start_time = time.time()
-        logger.info("Getting %d book predictions for user %s with genres: %s, for book_size: %s", count,
-                    user_id, genres, book_size)
+        logger.info("Getting %d book predictions for user %s with genres: %s", count, user_id, genres)
 
         books_read = self._get_books_read(user_id)
-        candidate_df = self._get_candidates(genres, books_read)
+        candidate_df = self._filter_candidates(genres, books_read)
         if candidate_df.empty:
             scored_items = []
         else:
@@ -67,8 +64,10 @@ class PredictionService:
         except (UserInfoClientException, UserInfoServerException):
             return []
 
-    def _get_candidates(self, genres: List[GenreList], books_read: List[int]):
+    def _filter_candidates(self, genres: List[GenreList], books_read: List[int]):
         all_candidates = self.books_dataframe.copy()
+
+        # Filter out genres they don't want to read
         if len(genres) > 0:
             query = " & ".join(f"{genre.name} == 1" for genre in genres)
             all_candidates.query(query, inplace=True)

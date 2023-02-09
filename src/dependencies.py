@@ -32,7 +32,7 @@ books_df = None
 
 
 def initialize_dependencies():
-    logging.warning("Initializing dependencies")
+    logging.info("Initializing dependencies")
     start_time = time.time()
     global book_id_to_f_book_id
     global f_book_id_to_book_id
@@ -58,7 +58,7 @@ def initialize_dependencies():
     model.load_state_dict(model_weights)
     model.eval()
 
-    logging.warning("Dependencies initialized in %s seconds", time.time() - start_time)
+    logging.info("Dependencies initialized in %s seconds", time.time() - start_time)
 
 
 def validate_dependencies():
