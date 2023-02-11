@@ -38,6 +38,12 @@ class UserNotFoundException(Exception):
 
 
 class PredictionService:
+    """
+    Service for making book recommendations for a given user. This is where the actual inference against the model
+    happens. The model is quite fussy about the data it gets, so we have to do a lot of filtering and data massaging
+    to get it to work, so apologies for the complexity here.
+    """
+
     def __init__(self, model: NCF, books_dataframe: pd.DataFrame, user_info_client: UserInfoClient,
                  factorization_service: FactorizationService):
         self.model = model

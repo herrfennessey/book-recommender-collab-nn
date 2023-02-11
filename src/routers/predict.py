@@ -19,4 +19,8 @@ async def get_book_predictions(
         genres: List[GenreList] = Query(list()),
         count: int = Query(20, gt=0, le=100),
         prediction_service: PredictionService = Depends(get_prediction_service)) -> PredictionServiceResponse:
+    """
+    Get recommendations for a given user. For now, I'm lazy and I don't have a DTO for this, so I'm just returning the
+    service response from the prediction service.
+    """
     return prediction_service.predict(user_id, genres, count)
