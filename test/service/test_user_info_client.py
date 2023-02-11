@@ -10,7 +10,7 @@ TEST_PROPERTIES = Properties(book_recommender_api_base_url="https://testurl", en
 
 
 def test_successful_response_from_user_info_client(httpx_mock):
-    httpx_mock.add_response(json={'book_ids': [1, 2, 3]}, url="https://testurl/users/1/books-read")
+    httpx_mock.add_response(json={'book_ids': [1, 2, 3]}, url="https://testurl/users/1/book-ids")
 
     user_id = 1
     client = UserInfoClient(properties=TEST_PROPERTIES)
@@ -20,7 +20,7 @@ def test_successful_response_from_user_info_client(httpx_mock):
 
 @pytest.mark.parametrize("response_code", [500, 501, 502, 503, 504])
 def test_5xx_custom_exception_from_user_info_client(response_code, httpx_mock):
-    httpx_mock.add_response(status_code=response_code, url="https://testurl/users/1/books-read")
+    httpx_mock.add_response(status_code=response_code, url="https://testurl/users/1/book-ids")
 
     user_id = 1
     client = UserInfoClient(properties=TEST_PROPERTIES)
@@ -29,7 +29,7 @@ def test_5xx_custom_exception_from_user_info_client(response_code, httpx_mock):
 
 @pytest.mark.parametrize("response_code", [400, 401, 402, 403, 404])
 def test_4xx_custom_exception_from_user_info_client(response_code, httpx_mock):
-    httpx_mock.add_response(status_code=response_code, url="https://testurl/users/1/books-read")
+    httpx_mock.add_response(status_code=response_code, url="https://testurl/users/1/book-ids")
 
     user_id = 1
     client = UserInfoClient(properties=TEST_PROPERTIES)
