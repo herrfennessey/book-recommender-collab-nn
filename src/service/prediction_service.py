@@ -85,24 +85,26 @@ class PredictionService:
         if factorized_user_id is None:
             raise UserNotFoundException(f"User ID does not exist in training data: {user_id}, cannot make predictions")
 
-        candidate_df.insert(0, 'f_user_id', factorized_user_id)
-        candidate_df['f_book_id'] = candidate_df['book_id'].map(self.factorization_service.factorize_book_id)
+        # Use .copy() because pandas throws a SettingWithCopyWarning otherwise
+        scored_df = candidate_df.copy()
+        scored_df.insert(0, 'f_user_id', factorized_user_id)
+        scored_df['f_book_id'] = candidate_df['book_id'].map(self.factorization_service.factorize_book_id)
         # If any rows don't have a factorized book ID, remove them
-        candidate_df = candidate_df[candidate_df['f_book_id'].notna()]
+        scored_df = scored_df[scored_df['f_book_id'].notna()]
         # Force column to int (it breaks the model if it's a float)
-        candidate_df['f_book_id'] = candidate_df['f_book_id'].astype(int)
+        scored_df['f_book_id'] = pd.to_numeric(scored_df['f_book_id'], downcast='integer').astype(int)
 
         predicted_labels = np.squeeze(self.model(
-            torch.tensor(candidate_df.loc[:, "f_user_id"].values),
-            torch.tensor(candidate_df.loc[:, "f_book_id"].values),
-            torch.FloatTensor(candidate_df.loc[:, [col for col in candidate_df if col.startswith('scaled')]].values),
+            torch.tensor(scored_df.loc[:, "f_user_id"].values),
+            torch.tensor(scored_df.loc[:, "f_book_id"].values),
+            torch.FloatTensor(scored_df.loc[:, [col for col in scored_df if col.startswith('scaled')]].values),
             torch.BoolTensor(
-                candidate_df.loc[:, [col for col in candidate_df if col.startswith('genre')]].values.astype(bool))
+                scored_df.loc[:, [col for col in scored_df if col.startswith('genre')]].values.astype(bool))
         ).detach().numpy())
 
-        candidate_df['score'] = predicted_labels
+        scored_df.loc[:, 'score'] = predicted_labels
         # Returns the top N books with the highest score into a list of dictionaries
-        return candidate_df.nlargest(MAX_RECOMMENDATION_COUNT, 'score')[['book_id', 'book_title', 'score']].to_dict(
+        return scored_df.nlargest(MAX_RECOMMENDATION_COUNT, 'score')[['book_id', 'book_title', 'score']].to_dict(
             orient='records')
 
 

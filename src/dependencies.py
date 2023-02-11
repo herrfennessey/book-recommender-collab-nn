@@ -23,8 +23,6 @@ class Properties(BaseSettings):
 root_path = Path(os.getenv("MODEL_FOLDER", "."))
 
 book_id_to_f_book_id = {}
-f_book_id_to_book_id = {}
-f_user_id_to_user_id = {}
 user_to_books_read = {}
 model_properties = {}
 model = None
@@ -35,18 +33,14 @@ def initialize_dependencies():
     logging.info("Initializing dependencies")
     start_time = time.time()
     global book_id_to_f_book_id
-    global f_book_id_to_book_id
     global user_id_to_f_user_id
-    global f_user_id_to_user_id
     global user_to_books_read
     global model
     global model_properties
     global books_df
 
     book_id_to_f_book_id = pickle.load(open(root_path / "book_id_to_f_book_id.p", "rb"))
-    f_book_id_to_book_id = pickle.load(open(root_path / "f_book_id_to_book_id.p", "rb"))
     user_id_to_f_user_id = pickle.load(open(root_path / "user_id_to_f_user_id.p", "rb"))
-    f_user_id_to_user_id = pickle.load(open(root_path / "f_user_id_to_user_id.p", "rb"))
     model_properties = pickle.load(open(root_path / "model_properties.p", "rb"))
 
     books_df = pandas.read_csv(root_path / "books.csv")
@@ -63,9 +57,7 @@ def initialize_dependencies():
 
 def validate_dependencies():
     assert len(get_book_id_to_f_book_id()) > 0, "book_id_to_f_book_id not initialized"
-    assert len(get_f_book_id_to_book_id()) > 0, "f_book_id_to_book_id not initialized"
     assert len(get_user_id_to_f_user_id()) > 0, "user_id_to_f_user_id not initialized"
-    assert len(get_f_user_id_to_user_id()) > 0, "f_user_id_to_user_id not initialized"
     assert len(get_model_properties()) > 0, "model_properties not initialized"
     assert type(get_model()) == NCF, "model not initialized"
     assert get_books_df() is not None, "books_df not initialized"
@@ -76,16 +68,8 @@ def get_book_id_to_f_book_id() -> dict:
     return book_id_to_f_book_id
 
 
-def get_f_book_id_to_book_id() -> dict:
-    return f_book_id_to_book_id
-
-
 def get_user_id_to_f_user_id() -> dict:
     return user_id_to_f_user_id
-
-
-def get_f_user_id_to_user_id() -> dict:
-    return f_user_id_to_user_id
 
 
 def get_model_properties() -> dict:

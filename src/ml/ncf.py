@@ -45,26 +45,4 @@ class NCF(pl.LightningModule):
 
         return pred
 
-    def training_step(self, batch, batch_idx):
-        user_input, item_input, item_details, item_meta, labels = batch
-        predicted_labels = self(user_input, item_input, item_details, item_meta)
-
-        reshaped_labels = labels.view(-1, 1).float()
-
-        self.f1(predicted_labels, reshaped_labels)
-        self.log("train_f1_step", self.f1)
-
-        loss = nn.BCELoss()(predicted_labels, reshaped_labels)
-
-        self.log("loss", loss)
-
-        return loss
-
-    def training_epoch_end(self, outputs):
-        avg_loss = torch.stack([x['loss'] for x in outputs]).mean()
-
-        self.log("train_f1_epoch", self.f1)
-        self.logger.experiment["train/avg_loss"].log(avg_loss)
-
-    def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters(), lr=self.learning_rate)
+    # Truncated t
