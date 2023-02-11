@@ -25,7 +25,7 @@ class UserInfoClient(object):
         self.base_url = properties.book_recommender_api_base_url
 
     def get_books_read(self, user_id):
-        url = self.base_url + "/users/" + str(user_id) + "/books-read"
+        url = self.base_url + "/users/" + str(user_id) + "/book-ids"
         try:
             response = httpx.get(url)
             if not response.is_error:
