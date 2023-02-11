@@ -47,6 +47,11 @@ def test_count_works_to_limit_results(test_client: TestClient):
     assert_that(response.json().get("items")).is_length(1)
 
 
+def test_unknown_user_throws_exception(test_client: TestClient):
+    response = test_client.get("/predict/99999999?count=1")
+    assert_that(response.status_code).is_equal_to(404)
+
+
 @pytest.mark.parametrize("genre_list, expected_count", [([], 3),
                                                         (["young_adult"], 1),
                                                         (["young_adult", "romance"], 1),
