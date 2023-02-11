@@ -33,6 +33,10 @@ class PredictionServiceResponse(BaseSettings):
     took_ms: int
 
 
+class UserNotFoundException(Exception):
+    pass
+
+
 class PredictionService:
     def __init__(self, model: NCF, books_dataframe: pd.DataFrame, user_info_client: UserInfoClient,
                  factorization_service: FactorizationService):
@@ -41,7 +45,7 @@ class PredictionService:
         self.user_info_client = user_info_client
         self.factorization_service = factorization_service
 
-    def predict(self, user_id, genres: List[GenreList], count: int = 20) -> PredictionServiceResponse:
+    def predict(self, user_id, genres: List[GenreList] = list(), count: int = 20) -> PredictionServiceResponse:
         start_time = time.time()
         logger.info("Getting %d book predictions for user %s with genres: %s", count, user_id, genres)
 
@@ -78,8 +82,15 @@ class PredictionService:
 
     def _score_candidates_for_user(self, candidate_df: pd.DataFrame, user_id: int):
         factorized_user_id = self.factorization_service.factorize_user_id(user_id)
+        if factorized_user_id is None:
+            raise UserNotFoundException(f"User ID does not exist in training data: {user_id}, cannot make predictions")
+
         candidate_df.insert(0, 'f_user_id', factorized_user_id)
         candidate_df['f_book_id'] = candidate_df['book_id'].map(self.factorization_service.factorize_book_id)
+        # If any rows don't have a factorized book ID, remove them
+        candidate_df = candidate_df[candidate_df['f_book_id'].notna()]
+        # Force column to int (it breaks the model if it's a float)
+        candidate_df['f_book_id'] = candidate_df['f_book_id'].astype(int)
 
         predicted_labels = np.squeeze(self.model(
             torch.tensor(candidate_df.loc[:, "f_user_id"].values),
