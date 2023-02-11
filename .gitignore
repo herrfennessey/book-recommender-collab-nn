@@ -131,3 +131,4 @@ dmypy.json
 # Model folder used for dev/testing
 /1672594012/
 
+.idea/sonarlint

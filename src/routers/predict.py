@@ -3,9 +3,8 @@ from typing import List
 
 from fastapi import APIRouter, Query, Path, Depends
 
-from src.models.book_size import BookSize
 from src.models.genre_list import GenreList
-from src.service.prediction_service import PredictionService, get_prediction_service
+from src.service.prediction_service import PredictionService, get_prediction_service, PredictionServiceResponse
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/predict")
@@ -17,8 +16,10 @@ async def get_book_predictions(
             title="The user ID from the Goodreads profile",
             gt=0,
             example=2189273),
-        genres: List[GenreList] = Query(None),
-        book_size: BookSize = Query(None),
+        genres: List[GenreList] = Query(list()),
         count: int = Query(20, gt=0, le=100),
-        prediction_service: PredictionService = Depends(get_prediction_service)):
-    return prediction_service.predict(user_id, genres, book_size, count)
+        prediction_service: PredictionService = Depends(get_prediction_service)) -> PredictionServiceResponse:
+    """
+    Get recommendations for a given user ID, if we've never seen the user before, it'll throw a 404.
+    """
+    return prediction_service.predict(user_id, genres, count)
